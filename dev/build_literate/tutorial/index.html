@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Tutorial · MRIeddyCurrentOptimization.jl</title><script data-outdated-warner src="../../assets/warner.js"></script><link rel="canonical" href="https://JakobAsslaender.github.io/MRIeddyCurrentOptimization.jl/build_literate/tutorial/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">MRIeddyCurrentOptimization.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li class="is-active"><a class="tocitem" href>Tutorial</a><ul class="internal"><li class="toplevel"><a class="tocitem" href="#Benchmarking"><span>Benchmarking</span></a></li></ul></li><li><a class="tocitem" href="../../api/">API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Tutorial</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Tutorial</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl/blob/master/docs/src/tutorial.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><p><a href="https://mybinder.org/v2/gh/JakobAsslaender/MRIeddyCurrentOptimization.jl/gh-pages?filepath=dev/build_literate/tutorial.ipynb"><img src="https://mybinder.org/badge_logo.svg" alt/></a></p><h1 id="Tutorial"><a class="docs-heading-anchor" href="#Tutorial">Tutorial</a><a id="Tutorial-1"></a><a class="docs-heading-anchor-permalink" href="#Tutorial" title="Permalink"></a></h1><p>The core of generalized Bloch model is implemented in the function <a href="build_literate/@ref"><code>apply_hamiltonian_gbloch!(∂m∂t, m, mfun, p, t)</code></a>, which calculates the derivative <code>∂m/∂t</code> for a given magnetization vector <code>m</code> and stores it in-place in the the variable <code>∂m∂t</code>. The function interface is written in a way that we can directly feed it into a differential equation solver of the <a href="https://diffeq.sciml.ai/stable/">DifferentialEquations.jl</a> package.</p><p>For this example, we need the following packages:</p><pre><code class="language-julia hljs">using MRIeddyCurrentOptimization
+using BenchmarkTools
+using LinearAlgebra
+using Random</code></pre><p>Define number of flip angles and cycles</p><pre><code class="language-julia hljs">nFA = 571
+nCyc = 872;</code></pre><p>calculate 2D golden means</p><pre><code class="language-julia hljs">s, v = eigen([0 1 0; 0 0 1; 1 0 1])
+GA1 = real(v[1,end] / v[end,end])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.4655712318767679</code></pre><p>second one</p><pre><code class="language-julia hljs">GA2 = real(v[2,end] / v[end,end])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.6823278038280193</code></pre><p>set up 3D radial koosh ball trajectory</p><pre><code class="language-julia hljs">theta = acos.(((0:(nCyc * nFA - 1)) * GA1) .% 1)
+phi = Float64.(0:(nCyc * nFA - 1)) * 2 * pi * GA2
+
+theta = reshape(theta, nCyc, nFA)
+phi   = reshape(phi, nCyc, nFA)
+theta = vec(theta)
+phi   = vec(phi)
+
+k = zeros(3, length(theta))
+k[3,:] = cos.(theta)
+k[2,:] = sin.(theta) .* sin.(phi)
+k[1,:] = sin.(theta) .* cos.(phi)
+
+k = reshape(k, 3, nCyc, nFA)
+k = permutedims(k, (1, 3, 2))
+kv = reshape(k, 3, nCyc*nFA);</code></pre><p>Set number of iterations</p><pre><code class="language-julia hljs">N = 10_000_000</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">10000000</code></pre><p>initalize with linear order</p><pre><code class="language-julia hljs">order = Int32.(1:(nCyc*nFA))
+order = reshape(order, nFA, nCyc)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">571×872 Matrix{Int32}:
+   1   572  1143  1714  2285  2856  3427  …  495629  496200  496771  497342
+   2   573  1144  1715  2286  2857  3428     495630  496201  496772  497343
+   3   574  1145  1716  2287  2858  3429     495631  496202  496773  497344
+   4   575  1146  1717  2288  2859  3430     495632  496203  496774  497345
+   5   576  1147  1718  2289  2860  3431     495633  496204  496775  497346
+   6   577  1148  1719  2290  2861  3432  …  495634  496205  496776  497347
+   7   578  1149  1720  2291  2862  3433     495635  496206  496777  497348
+   8   579  1150  1721  2292  2863  3434     495636  496207  496778  497349
+   9   580  1151  1722  2293  2864  3435     495637  496208  496779  497350
+  10   581  1152  1723  2294  2865  3436     495638  496209  496780  497351
+   ⋮                             ⋮        ⋱                       ⋮  
+ 563  1134  1705  2276  2847  3418  3989     496191  496762  497333  497904
+ 564  1135  1706  2277  2848  3419  3990     496192  496763  497334  497905
+ 565  1136  1707  2278  2849  3420  3991     496193  496764  497335  497906
+ 566  1137  1708  2279  2850  3421  3992  …  496194  496765  497336  497907
+ 567  1138  1709  2280  2851  3422  3993     496195  496766  497337  497908
+ 568  1139  1710  2281  2852  3423  3994     496196  496767  497338  497909
+ 569  1140  1711  2282  2853  3424  3995     496197  496768  497339  497910
+ 570  1141  1712  2283  2854  3425  3996     496198  496769  497340  497911
+ 571  1142  1713  2284  2855  3426  3997  …  496199  496770  497341  497912</code></pre><p>calculate initial cost</p><pre><code class="language-julia hljs">MRIeddyCurrentOptimization.cost(kv,order)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">77850.22181692667</code></pre><p>call simulated annealing algorithm that changes the order in place (as indicated by the ! at the end of the function call)</p><pre><code class="language-julia hljs">SimulatedAnneling!(kv, order, N, nFA, nCyc)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">571×872 Matrix{Int32}:
+      1   54246  108491    1143  270084  …  255238  383142  338604  232969
+ 291212  395705  360303  467080  146178     195855  289499   45682  231257
+ 318050  110206  178726  404271   50822     260379  348884  426540  495631
+ 460230     575   33122  318051   47397     495632  300350   68524  254670
+ 327188  193003  275798   41117  421403     170163  276940  384859  227834
+  86227  347745  175303  308917  302636  …   73094  496205   65100  265521
+ 318054   97648    1149   77092   41690     159316  190721  496777  191863
+  26845  464231  112495  145613  363164     495636  408273   67386   10286
+ 150753  356313  231264  194149  123916     240400  133052  178732  497350
+ 143331   61678  339184  217561  445390     437967  496209  496780  366021
+      ⋮                                  ⋱                       ⋮  
+ 178715  425387  102201    2276  171863     206694  291773  473922  497904
+ 432240  314043  318040  268363  466500     106199  327747  489911  231819
+ 387132  263796  487057  257515   63946     322038  473353   99919  292917
+    566  229537   50243  173008  212978  …  224969   95923   73083  497907
+ 146172  376856  305481  178148  421394      66803  496766   80507  497908
+ 146173  222116  181575  309479  430531     496196   14843  360869  244385
+ 102778  279788    1711  226685  137609     375716  359728  412831  497910
+ 443666  448805  319759  285499  479068     174154  447663  344312  194139
+ 326612  190143   42825  226116  261518  …    8565   75372  243817  497912</code></pre><p>calculate the final cost</p><pre><code class="language-julia hljs">MRIeddyCurrentOptimization.cost(kv,order)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">11307.612287533324</code></pre><h1 id="Benchmarking"><a class="docs-heading-anchor" href="#Benchmarking">Benchmarking</a><a id="Benchmarking-1"></a><a class="docs-heading-anchor-permalink" href="#Benchmarking" title="Permalink"></a></h1><pre><code class="language-julia hljs">N = 1_000
+@benchmark SimulatedAnneling!($kv, $order, $N, $nFA, $nCyc, rng = $(MersenneTwister(12345)))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">BenchmarkTools.Trial: 10000 samples with 1 evaluation.
+ Range (min … max):  183.783 μs …  1.254 ms  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     199.343 μs              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   206.646 μs ± 34.523 μs  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+   █  ▅                                                         
+  ▅█▅▇█▆██▆█▇▅▆▅▅▄▅▄▄▄▃▃▃▃▃▃▃▃▂▂▂▂▂▂▂▂▂▂▂▂▂▁▂▂▂▂▂▂▂▂▂▂▂▂▁▁▂▂▂▂ ▃
+  184 μs          Histogram: frequency by time          312 μs &lt;
+
+ Memory estimate: 0 bytes, allocs estimate: 0.</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../../api/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.10 on <span class="colophon-date" title="Friday 29 October 2021 21:56">Friday 29 October 2021</span>. Using Julia version 1.6.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

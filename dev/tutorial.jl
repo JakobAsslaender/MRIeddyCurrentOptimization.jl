@@ -1,0 +1,60 @@
+#md # [![](https://mybinder.org/badge_logo.svg)](@__BINDER_ROOT_URL__/build_literate/tutorial.ipynb)
+
+# # Tutorial
+
+# The core of generalized Bloch model is implemented in the function [`apply_hamiltonian_gbloch!(∂m∂t, m, mfun, p, t)`](@ref), which calculates the derivative `∂m/∂t` for a given magnetization vector `m` and stores it in-place in the the variable `∂m∂t`. The function interface is written in a way that we can directly feed it into a differential equation solver of the [DifferentialEquations.jl](https://diffeq.sciml.ai/stable/) package.
+
+# For this example, we need the following packages:
+using MRIeddyCurrentOptimization
+using BenchmarkTools
+using LinearAlgebra
+using Random
+
+# Define number of flip angles and cycles
+nFA = 571
+nCyc = 872;
+
+# calculate 2D golden means
+s, v = eigen([0 1 0; 0 0 1; 1 0 1])
+GA1 = real(v[1,end] / v[end,end])
+
+# second one
+GA2 = real(v[2,end] / v[end,end])
+
+# set up 3D radial koosh ball trajectory
+theta = acos.(((0:(nCyc * nFA - 1)) * GA1) .% 1)
+phi = Float64.(0:(nCyc * nFA - 1)) * 2 * pi * GA2
+
+theta = reshape(theta, nCyc, nFA)
+phi   = reshape(phi, nCyc, nFA)
+theta = vec(theta)
+phi   = vec(phi)
+
+k = zeros(3, length(theta))
+k[3,:] = cos.(theta)
+k[2,:] = sin.(theta) .* sin.(phi)
+k[1,:] = sin.(theta) .* cos.(phi)
+
+k = reshape(k, 3, nCyc, nFA)
+k = permutedims(k, (1, 3, 2))
+kv = reshape(k, 3, nCyc*nFA);
+
+# Set number of iterations
+N = 10_000_000
+
+# initalize with linear order
+order = Int32.(1:(nCyc*nFA))
+order = reshape(order, nFA, nCyc)
+
+# calculate initial cost
+MRIeddyCurrentOptimization.cost(kv,order)
+
+# call simulated annealing algorithm that changes the order in place (as indicated by the ! at the end of the function call)
+SimulatedAnneling!(kv, order, N, nFA, nCyc)
+
+# calculate the final cost
+MRIeddyCurrentOptimization.cost(kv,order)
+
+# # Benchmarking
+N = 1_000
+@benchmark SimulatedAnneling!($kv, $order, $N, $nFA, $nCyc, rng = $(MersenneTwister(12345)))
