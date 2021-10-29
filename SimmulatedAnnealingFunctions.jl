@@ -1,5 +1,5 @@
 
-function cost(kv, x, w_exp, w_even)
+function cost(kv, x, w_exp=3, w_even=1)
     xv = vec(x)
     dk = kv[:,xv[1:end - 1]] - kv[:,x[2:end]]
     dk = reduce(+, dk.^2, dims=1).^w_exp
@@ -8,14 +8,9 @@ function cost(kv, x, w_exp, w_even)
 end
 
 
-function delta_cost(kv, x, iFA, nFA, iC1, iC2, w_exp, w_even)
-    if iFA % 2 == 0
-        w12 = 1
-        w23 = w_even
-    else
-        w12 = w_even
-        w23 = 1
-    end
+function delta_cost(kv, x, iFA, nFA, iC1, iC2, w_exp=3, w_even=1)
+    w12 = iFA % 2 == 0 ? w_even : 1
+    w23 = iFA % 2 != 0 ? w_even : 1
 
     i1 = (iC1 - 1) * nFA + iFA
     i2 = (iC2 - 1) * nFA + iFA
@@ -30,47 +25,47 @@ function delta_cost(kv, x, iFA, nFA, iC1, iC2, w_exp, w_even)
     Δk  = (kv[1,x11] - kv[1,x12])^2
     Δk += (kv[2,x11] - kv[2,x12])^2
     Δk += (kv[3,x11] - kv[3,x12])^2
-    co = w12 * Δk^w_exp
+    Δc = -w12 * Δk^w_exp
 
     Δk  = (kv[1,x11] - kv[1,x22])^2
     Δk += (kv[2,x11] - kv[2,x22])^2
     Δk += (kv[3,x11] - kv[3,x22])^2
-    cn = w12 * Δk^w_exp
+    Δc += w12 * Δk^w_exp
 
 
     Δk  = (kv[1,x12] - kv[1,x13])^2
     Δk += (kv[2,x12] - kv[2,x13])^2
     Δk += (kv[3,x12] - kv[3,x13])^2
-    co += w23 * Δk^w_exp
+    Δc -= w23 * Δk^w_exp
 
     Δk  = (kv[1,x22] - kv[1,x13])^2
     Δk += (kv[2,x22] - kv[2,x13])^2
     Δk += (kv[3,x22] - kv[3,x13])^2
-    cn += w23 * Δk^w_exp
+    Δc += w23 * Δk^w_exp
 
 
     Δk  = (kv[1,x21] - kv[1,x22])^2
     Δk += (kv[2,x21] - kv[2,x22])^2
     Δk += (kv[3,x21] - kv[3,x22])^2
-    co += w12 * Δk^w_exp
+    Δc -= w12 * Δk^w_exp
 
     Δk  = (kv[1,x21] - kv[1,x12])^2
     Δk += (kv[2,x21] - kv[2,x12])^2
     Δk += (kv[3,x21] - kv[3,x12])^2
-    cn += w12 * Δk^w_exp
+    Δc += w12 * Δk^w_exp
 
 
     Δk  = (kv[1,x22] - kv[1,x23])^2
     Δk += (kv[2,x22] - kv[2,x23])^2
     Δk += (kv[3,x22] - kv[3,x23])^2
-    co += w12 * Δk^w_exp
+    Δc -= w23 * Δk^w_exp
 
     Δk  = (kv[1,x12] - kv[1,x23])^2
     Δk += (kv[2,x12] - kv[2,x23])^2
     Δk += (kv[3,x12] - kv[3,x23])^2
-    cn += w12 * Δk^w_exp
+    Δc += w23 * Δk^w_exp
 
-    return cn - co
+    return Δc
 end
 
 function delta_cost_pairs(kv, x, iFA, iC1, iC2, w_exp)
@@ -94,34 +89,34 @@ function delta_cost_pairs(kv, x, iFA, iC1, iC2, w_exp)
 end
 
 
-function SimulatedAnneling!(k_vec, order, N, nFA, nCyc, w_exp, w_even; rng = MersenneTwister(12345))
-    for ii = 1:N
+function SimulatedAnneling!(k_vec, order, N_iter, nFA, N_c; w_exp = 3, w_even = 1, rng = MersenneTwister(12345), verbose = false)
+    for ii = 1:N_iter
         iFA = Int32.(ceil.(rand(rng) * nFA))
-        iC1 = Int32.(ceil.(rand(rng) * nCyc))
-        iC2 = Int32.(ceil.(rand(rng) * nCyc))
+        iC1 = Int32.(ceil.(rand(rng) * N_c))
+        iC2 = Int32.(ceil.(rand(rng) * N_c))
 
         if iFA == 1 && (iC1 == 1 || iC2 == 1)
             iFA = 2
-        elseif iFA == nFA && (iC1 == nCyc || iC2 == nCyc)
+        elseif iFA == nFA && (iC1 == N_c || iC2 == N_c)
             iFA = nFA - 1
         end
 
         c = delta_cost(k_vec, order, iFA, nFA, iC1, iC2, w_exp, w_even)
-        if exp(-c / (1 - ii / N)^6) > rand(rng)
+        if exp(-c / (1 - ii / N_iter)^6) > rand(rng)
             x2 = order[iFA,iC2]
             order[iFA,iC2] = order[iFA,iC1]
             order[iFA,iC1] = x2
         end
-        # if ii % (N / 100) == 0
-        #     println(string(round(ii / N * 1e2), "% completed; cost = ", cost(k_vec, order, w_exp, w_even)))
-        #     flush(stdout)
-        # end
+        if verbose && ii % (N / 100) == 0
+            println(string(round(ii / N * 1e2), "% completed; cost = ", cost(k_vec, order, w_exp, w_even)))
+            flush(stdout)
+        end
     end
     return order
 end
 
 
-function SimulatedAnneling_Pairs!(kv, order, N, nFA, nCyc, w_exp; rng = MersenneTwister(12345))
+function SimulatedAnneling_Pairs!(kv, order, N, nFA, nCyc; w_exp = 3, rng = MersenneTwister(12345), verbose = false)
     for ii = 1:N
         iFA = Int32.(ceil.(rand(rng) * nFA / 2) * 2)
         iC1 = Int32.(ceil.(rand(rng) * nCyc))
@@ -146,10 +141,10 @@ function SimulatedAnneling_Pairs!(kv, order, N, nFA, nCyc, w_exp; rng = Mersenne
                 order[iFA:iFA + 1,iC1] = x2
             end
         end
-        # if ii % (N / 1000) == 0
-        #     println(string(round(ii / N * 1e3) / 10, " completed; cost = ", cost(kv, order, w_exp, 1)))
-        #     flush(stdout)
-        # end
+        if verbose && ii % (N / 100) == 0
+            println(string(round(ii / N * 1e2), " completed; cost = ", cost(kv, order, w_exp, 1)))
+            flush(stdout)
+        end
     end
     return order
 end
