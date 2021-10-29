@@ -45,7 +45,7 @@ for file in files
     Literate.script(  file_path, OUTPUT)
 end
 
-DocMeta.setdocmeta!(MRIgeneralizedBloch, :DocTestSetup, :(using MRIeddyCurrentOptimization); recursive=true)
+DocMeta.setdocmeta!(MRIeddyCurrentOptimization, :DocTestSetup, :(using MRIeddyCurrentOptimization); recursive=true)
 
 makedocs(;
     doctest = false,

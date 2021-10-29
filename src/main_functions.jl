@@ -103,9 +103,9 @@ function SimulatedAnneling!(k_vec, order, N_iter, nFA, N_c; w_exp = 3, w_even = 
 
         c = delta_cost(k_vec, order, iFA, nFA, iC1, iC2, w_exp, w_even)
         if exp(-c / (1 - ii / N_iter)^6) > rand(rng)
-            x2 = order[iFA,iC2]
+            tmp = order[iFA,iC2]
             order[iFA,iC2] = order[iFA,iC1]
-            order[iFA,iC1] = x2
+            order[iFA,iC1] = tmp
         end
         if verbose && ii % (N / 100) == 0
             println(string(round(ii / N * 1e2), "% completed; cost = ", cost(k_vec, order, w_exp, w_even)))

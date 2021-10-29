@@ -1,0 +1,7 @@
+scripts/*
+*.out
+.vscode/
+docs/build
+docs/src/build*
+docs/Manifest.toml
+.DS_Store
