@@ -94,17 +94,16 @@ function cost_part_pairs(kv, x, iFA, iC1, iC2, w_exp)
 end
 
 
-function SimulatedAnneling_fast!(k_vec, order, N, nFA, nCyc, w_exp, w_even)
-    rng = MersenneTwister(12345);
+function SimulatedAnneling_fast!(k_vec, order, N, nFA, nCyc, w_exp, w_even; rng = MersenneTwister(12345))
     for ii = 1:N
         iFA = Int32.(ceil.(rand(rng) * nFA))
         iC1 = Int32.(ceil.(rand(rng) * nCyc))
         iC2 = Int32.(ceil.(rand(rng) * nCyc))
 
         if iFA == 1 && (iC1 == 1 || iC2 == 1)
-            iFA = 2;
+            iFA = 2
         elseif iFA == nFA && (iC1 == nCyc || iC2 == nCyc)
-            iFA = nFA - 1;
+            iFA = nFA - 1
         end
 
         c = cost_part(k_vec, order, iFA, nFA, iC1, iC2, w_exp, w_even)
@@ -113,10 +112,10 @@ function SimulatedAnneling_fast!(k_vec, order, N, nFA, nCyc, w_exp, w_even)
             order[iFA,iC2] = order[iFA,iC1]
             order[iFA,iC1] = x2
         end
-        if ii % (N / 100) == 0
-            println(string(round(ii / N * 1e3) / 10, " completed; cost = ", cost(k_vec, order, w_exp, w_even)))
-            flush(stdout)
-        end
+        # if ii % (N / 100) == 0
+        #     println(string(round(ii / N * 1e2), "% completed; cost = ", cost(k_vec, order, w_exp, w_even)))
+        #     flush(stdout)
+        # end
     end
     return order
 end
