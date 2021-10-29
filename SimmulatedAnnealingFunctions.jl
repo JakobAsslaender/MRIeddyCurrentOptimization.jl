@@ -1,14 +1,14 @@
 
 function cost(kv, x, w_exp, w_even)
-    xv = vec(x);
-    dk = kv[:,xv[1:end - 1]] - kv[:,x[2:end]];
-    dk = reduce(+, dk.^2, dims=1).^w_exp;
-    c = sum(dk[1:2:end]) + w_even * sum(dk[2:2:end]);    
+    xv = vec(x)
+    dk = kv[:,xv[1:end - 1]] - kv[:,x[2:end]]
+    dk = reduce(+, dk.^2, dims=1).^w_exp
+    c = sum(dk[1:2:end]) + w_even * sum(dk[2:2:end])  
     return c
 end
 
 
-function cost_part(kv, x, iFA, nFA, iC1, iC2, w_exp, w_even)
+function delta_cost(kv, x, iFA, nFA, iC1, iC2, w_exp, w_even)
     if iFA % 2 == 0
         w12 = 1
         w23 = w_even
@@ -73,28 +73,28 @@ function cost_part(kv, x, iFA, nFA, iC1, iC2, w_exp, w_even)
     return cn - co
 end
 
-function cost_part_pairs(kv, x, iFA, iC1, iC2, w_exp)
+function delta_cost_pairs(kv, x, iFA, iC1, iC2, w_exp)
 
-    i1 = (iC1 - 1) * nFA + iFA;
-    i2 = (iC2 - 1) * nFA + iFA;
+    i1 = (iC1 - 1) * nFA + iFA
+    i2 = (iC2 - 1) * nFA + iFA
 
-    xv = vec(x);
-    co  = reduce(+, (kv[:,xv[i1 - 1]] - kv[:,xv[i1]]).^2, dims=1).^w_exp;
-    co += reduce(+, (kv[:,xv[i1 + 1]] - kv[:,xv[i1 + 2]]).^2, dims=1).^w_exp;
-    co += reduce(+, (kv[:,xv[i2 - 1]] - kv[:,xv[i2]]).^2, dims=1).^w_exp;
-    co += reduce(+, (kv[:,xv[i2 + 1]] - kv[:,xv[i2 + 2]]).^2, dims=1).^w_exp;
+    xv = vec(x)
+    co  = reduce(+, (kv[:,xv[i1 - 1]] - kv[:,xv[i1]]).^2, dims=1).^w_exp
+    co += reduce(+, (kv[:,xv[i1 + 1]] - kv[:,xv[i1 + 2]]).^2, dims=1).^w_exp
+    co += reduce(+, (kv[:,xv[i2 - 1]] - kv[:,xv[i2]]).^2, dims=1).^w_exp
+    co += reduce(+, (kv[:,xv[i2 + 1]] - kv[:,xv[i2 + 2]]).^2, dims=1).^w_exp
 
-    cn  = reduce(+, (kv[:,xv[i1 - 1]] - kv[:,xv[i2]]).^2, dims=1).^w_exp;
-    cn += reduce(+, (kv[:,xv[i2 + 1]] - kv[:,xv[i1 + 2]]).^2, dims=1).^w_exp;
-    cn += reduce(+, (kv[:,xv[i2 - 1]] - kv[:,xv[i1]]).^2, dims=1).^w_exp;
-    cn += reduce(+, (kv[:,xv[i1 + 1]] - kv[:,xv[i2 + 2]]).^2, dims=1).^w_exp;
+    cn  = reduce(+, (kv[:,xv[i1 - 1]] - kv[:,xv[i2]]).^2, dims=1).^w_exp
+    cn += reduce(+, (kv[:,xv[i2 + 1]] - kv[:,xv[i1 + 2]]).^2, dims=1).^w_exp
+    cn += reduce(+, (kv[:,xv[i2 - 1]] - kv[:,xv[i1]]).^2, dims=1).^w_exp
+    cn += reduce(+, (kv[:,xv[i1 + 1]] - kv[:,xv[i2 + 2]]).^2, dims=1).^w_exp
 
-    c = cn - co;
+    c = cn - co
     return c[1]
 end
 
 
-function SimulatedAnneling_fast!(k_vec, order, N, nFA, nCyc, w_exp, w_even; rng = MersenneTwister(12345))
+function SimulatedAnneling!(k_vec, order, N, nFA, nCyc, w_exp, w_even; rng = MersenneTwister(12345))
     for ii = 1:N
         iFA = Int32.(ceil.(rand(rng) * nFA))
         iC1 = Int32.(ceil.(rand(rng) * nCyc))
@@ -106,7 +106,7 @@ function SimulatedAnneling_fast!(k_vec, order, N, nFA, nCyc, w_exp, w_even; rng 
             iFA = nFA - 1
         end
 
-        c = cost_part(k_vec, order, iFA, nFA, iC1, iC2, w_exp, w_even)
+        c = delta_cost(k_vec, order, iFA, nFA, iC1, iC2, w_exp, w_even)
         if exp(-c / (1 - ii / N)^6) > rand(rng)
             x2 = order[iFA,iC2]
             order[iFA,iC2] = order[iFA,iC1]
@@ -121,62 +121,35 @@ function SimulatedAnneling_fast!(k_vec, order, N, nFA, nCyc, w_exp, w_even; rng 
 end
 
 
-function SimulatedAnneling_Pairs(kv, order, N, nFA, nCyc, w_exp)
-    rng = MersenneTwister(12345);
+function SimulatedAnneling_Pairs!(kv, order, N, nFA, nCyc, w_exp; rng = MersenneTwister(12345))
     for ii = 1:N
-        iFA = Int32.(ceil.(rand(rng) * nFA / 2) * 2);
-        iC1 = Int32.(ceil.(rand(rng) * nCyc));
-        iC2 = Int32.(ceil.(rand(rng) * nCyc));
+        iFA = Int32.(ceil.(rand(rng) * nFA / 2) * 2)
+        iC1 = Int32.(ceil.(rand(rng) * nCyc))
+        iC2 = Int32.(ceil.(rand(rng) * nCyc))
 
         if iFA == nFA && (iC1 == nCyc || iC2 == nCyc)
             iFA = nFA - 2;
         end
 
-        c = cost_part_pairs(kv, order, iFA, iC1, iC2, w_exp);
+        c = delta_cost_pairs(kv, order, iFA, iC1, iC2, w_exp)
         if exp(-c / (1 - ii / N)^6) > rand(rng)
             if iFA == nFA
-                x21 = order[iFA,iC2];
-                x22 = order[1,iC2+1];
-                order[iFA,iC2] = order[iFA,iC1];
-                order[1,iC2+1] = order[1,iC1+1];
-                order[iFA,iC1] = x21;
-                order[1,iC1+1] = x22;
+                x21 = order[iFA,iC2]
+                x22 = order[1,iC2+1]
+                order[iFA,iC2] = order[iFA,iC1]
+                order[1,iC2+1] = order[1,iC1+1]
+                order[iFA,iC1] = x21
+                order[1,iC1+1] = x22
             else
-                x2 = order[iFA:iFA + 1,iC2];
-                order[iFA:iFA + 1,iC2] = order[iFA:iFA + 1,iC1];
-                order[iFA:iFA + 1,iC1] = x2;
+                x2 = order[iFA:iFA + 1,iC2]
+                order[iFA:iFA + 1,iC2] = order[iFA:iFA + 1,iC1]
+                order[iFA:iFA + 1,iC1] = x2
             end
         end
-        if ii % (N / 1000) == 0
-            println(string(round(ii / N * 1e3) / 10, " completed; cost = ", cost(kv, order, w_exp, 1)))
-            flush(stdout)
-        end
+        # if ii % (N / 1000) == 0
+        #     println(string(round(ii / N * 1e3) / 10, " completed; cost = ", cost(kv, order, w_exp, 1)))
+        #     flush(stdout)
+        # end
     end
     return order
 end
-
-# function SimulatedAnneling_WholeCost(kv, x, N, nFA, nCyc)
-#     rng = MersenneTwister(12345);
-#     c = cost(kv, x);
-#     for ii = 1:N
-#         iFA = Int32.(ceil.(rand(rng) * nFA));
-#         iC1 = Int32.(ceil.(rand(rng) * nCyc));
-#         iC2 = Int32.(ceil.(rand(rng) * nCyc));
-        
-#         if iFA == 1 && (iC1 == 1 || iC2 == 1)
-#             iFA = 2;
-#         elseif iFA == nFA && (iC1 == nCyc || iC2 == nCyc)
-#             iFA = nFA-1;
-#         end
-
-#         xn = copy(x);
-#         xn[iFA,iC1] = x[iFA,iC2];
-#         xn[iFA,iC2] = x[iFA,iC1];
-#         cn = cost(kv, xn);
-#         if exp(-(cn - c) / (1 - ii / N)^6) > rand(rng) 
-#             x = xn;
-#             c = copy(cn);
-#         end
-#     end
-#     return x
-# end

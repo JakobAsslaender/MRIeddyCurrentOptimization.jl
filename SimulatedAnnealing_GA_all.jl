@@ -49,8 +49,7 @@ w_even = 1;
 xinit = Int32.(1:(nCyc*nFA))
 xinit = reshape(xinit, nFA, nCyc)
 println(cost(kv,xinit,w_exp/2,w_even))
-# xopt = SimulatedAnneling(kv, xinit, N, nFA, nCyc)
-xopt = SimulatedAnneling_fast!(kv, xinit, N, nFA, nCyc,w_exp/2,w_even)
+xopt = SimulatedAnneling!(kv, xinit, N, nFA, nCyc,w_exp/2,w_even)
 cost(kv,xopt,w_exp/2,w_even)
 
 

@@ -28,19 +28,15 @@ k[2,:] = sin.(theta) .* sin.(phi);
 k[1,:] = sin.(theta) .* cos.(phi);
 
 ##
-# N = Int64.(1e9);
 N = parse(Int32, ENV["SLURM_ARRAY_TASK_ID"])
 N = Int64.(10^N);
 w_exp = 6;
-# w_even = parse(Int32, ENV["SLURM_ARRAY_TASK_ID"])
-# w_even = 100;
-w_even = 1;
+w_even = parse(Int32, ENV["Iter_exp"])
 
 xinit = Int32.(1:(nCyc*nFA));
 xinit = reshape(xinit, nFA, nCyc);
 println(cost(k,xinit,w_exp/2,w_even));
-# xopt = SimulatedAnneling(kv, xinit, N, nFA, nCyc)
-xopt = SimulatedAnneling_fast(k, xinit, N, nFA, nCyc,w_exp/2,w_even);
+xopt = SimulatedAnneling!(k, xinit, N, nFA, nCyc,w_exp/2,w_even);
 cost(k,xopt,w_exp/2,w_even)
 
 

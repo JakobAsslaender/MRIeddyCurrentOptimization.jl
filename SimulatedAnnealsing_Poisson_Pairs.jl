@@ -32,8 +32,7 @@ w_exp = 6;
 xinit = Int32.(1:(nCyc*nFA));
 xinit = reshape(xinit, nFA, nCyc);
 println(cost(k,xinit,w_exp/2,1));
-# xopt = SimulatedAnneling(kv, xinit, N, nFA, nCyc)
-xopt = SimulatedAnneling_Pairs(k, xinit, N, nFA, nCyc,w_exp/2);
+xopt = SimulatedAnneling_Pairs!(k, xinit, N, nFA, nCyc,w_exp/2);
 cost(k,xopt,w_exp/2,1)
 
 
