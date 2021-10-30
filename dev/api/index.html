@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>API · MRIeddyCurrentOptimization.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link rel="canonical" href="https://JakobAsslaender.github.io/MRIeddyCurrentOptimization.jl/api/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">MRIeddyCurrentOptimization.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../build_literate/tutorial/">Tutorial</a></li><li class="is-active"><a class="tocitem" href>API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>API</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>API</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl/blob/master/docs/src/api.md#" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="API"><a class="docs-heading-anchor" href="#API">API</a><a id="API-1"></a><a class="docs-heading-anchor-permalink" href="#API" title="Permalink"></a></h1><p>In the following, you find the documentation of all exported functions of the <a href="https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl">MRIeddyCurrentOptimization.jl</a> package:</p><ul><li><a href="#MRIeddyCurrentOptimization.SimulatedAnneling!-Tuple{Any, Any}"><code>MRIeddyCurrentOptimization.SimulatedAnneling!</code></a></li></ul><article class="docstring"><header><a class="docstring-binding" id="MRIeddyCurrentOptimization.SimulatedAnneling!-Tuple{Any, Any}" href="#MRIeddyCurrentOptimization.SimulatedAnneling!-Tuple{Any, Any}"><code>MRIeddyCurrentOptimization.SimulatedAnneling!</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia hljs">SimulatedAnneling!(k, order[;N_iter=1_000_000_000, p=3, w_even=1, rng = MersenneTwister(12345), verbose = false])</code></pre><p>Performs the simulated annealing algorith and writes the result in-place in <code>order</code> and returns <code>order</code> for convenience.</p><p><strong>Arguemnts</strong></p><ul><li><code>k::Matrix{Number}</code>: 3 x N_spokes matrix containing the [x,y,z] coordinates of the first data point of each spoke</li><li><code>order::Matrix{Int}</code>: nFA x nCyc matrix containing the indices in which the spokes in <code>k</code> are acquired. This matrix is overwritten by the algorithm with the optimized index matrix. </li></ul><p>Optional:</p><ul><li><code>N_iter::Int</code>: Number of iterations. The default is <code>1e9</code></li><li><code>T2s_max::Number</code>: upper bound of the <code>T2s</code> range in seconds</li><li><code>p::Number</code>: exponent to scale the squared-Euclidean distance. Default is <code>p=3</code>, which is equivalent to <code>p=6</code> in the paper, as the Euclidean distance is already squared. </li><li><code>w_even::Number</code>: weighting factor of the even jumps. The default is <code>w_even=1</code> which weights even and odd equally. Choose <code>w_even=0</code> for Bieri&#39;s paring approch. </li><li><code>rng</code>: seed for the random number generator. The default is <code>rng = MersenneTwister(12345)</code>. Use a different seed when repeating the algorithm for a different outcome. </li><li><code>verbose::Boolean</code>: by default this flag is <code>false</code> and no output is printed. When set to <code>true</code>, the algorithm prints the cost at each full percent of runtime.</li></ul><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; using MRIeddyCurrentOptimization
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>API · MRIeddyCurrentOptimization.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link rel="canonical" href="https://JakobAsslaender.github.io/MRIeddyCurrentOptimization.jl/api/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../build_literate/tutorial/">MRIeddyCurrentOptimization.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../build_literate/tutorial/">Home</a></li><li class="is-active"><a class="tocitem" href>API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>API</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>API</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl/blob/master/docs/src/api.md#" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="API"><a class="docs-heading-anchor" href="#API">API</a><a id="API-1"></a><a class="docs-heading-anchor-permalink" href="#API" title="Permalink"></a></h1><p>In the following, you find the documentation of all exported functions of the <a href="https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl">MRIeddyCurrentOptimization.jl</a> package:</p><ul><li><a href="#MRIeddyCurrentOptimization.SimulatedAnneling!-Tuple{Any, Any}"><code>MRIeddyCurrentOptimization.SimulatedAnneling!</code></a></li><li><a href="#MRIeddyCurrentOptimization.cost-Tuple{Any, Any}"><code>MRIeddyCurrentOptimization.cost</code></a></li><li><a href="#MRIeddyCurrentOptimization.delta_cost-NTuple{5, Any}"><code>MRIeddyCurrentOptimization.delta_cost</code></a></li></ul><article class="docstring"><header><a class="docstring-binding" id="MRIeddyCurrentOptimization.SimulatedAnneling!-Tuple{Any, Any}" href="#MRIeddyCurrentOptimization.SimulatedAnneling!-Tuple{Any, Any}"><code>MRIeddyCurrentOptimization.SimulatedAnneling!</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia hljs">SimulatedAnneling!(k, order[;N_iter=1_000_000_000, p=3, w_even=1, rng = MersenneTwister(12345), verbose = false])</code></pre><p>Performs the simulated annealing algorithm and writes the result in-place in <code>order</code>. For convenience, <code>order</code> is also returned.</p><p><strong>Arguemnts</strong></p><p><strong>Required</strong></p><ul><li><code>k::Matrix{Number}</code>: 3 x (N<em>t N</em>c) matrix containing the [x,y,z] coordinates of the first data point of each spoke</li><li><code>order::Matrix{Int}</code>: N<em>t x N</em>c matrix containing the indices in which the spokes in <code>k</code> are acquired. This matrix is overwritten by the algorithm with the optimized index matrix. </li></ul><p><strong>Optional</strong></p><ul><li><code>N_iter::Int</code>: Number of iterations. The default is <code>1e9</code></li><li><code>p::Number</code>: exponent to scale the squared-Euclidean distance. Default is <code>p=3</code>, which is equivalent to <code>p=6</code> in the paper, as the Euclidean distance is already squared. </li><li><code>w_even::Number</code>: weighting factor of the even jumps. The default is <code>w_even=1</code> which weights even and odd jumps equally. Set <code>w_even=0</code> for Bieri&#39;s paring approch. </li><li><code>rng</code>: seed for the random number generator. The default is <code>rng = MersenneTwister(12345)</code>. Use a different seed when repeating the algorithm for a different outcome. </li><li><code>verbose::Boolean</code>: by default this flag is <code>false</code> and no output is printed. When set to <code>true</code>, the algorithm prints the cost at each full percent of the total number of iterations.</li></ul><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; using MRIeddyCurrentOptimization
 
-julia&gt; nFA  = 10;
+julia&gt; N_t  = 10;
 
-julia&gt; nCyc = 5;
+julia&gt; N_c = 5;
 
-julia&gt; theta = acos.(((0:(nCyc * nFA - 1)) * 0.46557) .% 1);
+julia&gt; theta = acos.(((0:(N_c * N_t - 1)) * 0.46557) .% 1);
 
-julia&gt; phi = Float64.(0:(nCyc * nFA - 1)) * 2 * pi * 0.6823;
+julia&gt; phi = Float64.(0:(N_c * N_t - 1)) * 2 * pi * 0.6823;
 
 julia&gt; k = zeros(3, length(theta));
 
@@ -17,17 +17,17 @@ julia&gt; k[2,:] = sin.(theta) .* sin.(phi);
 
 julia&gt; k[1,:] = sin.(theta) .* cos.(phi);
 
-julia&gt; k = reshape(k, 3, nCyc, nFA);
+julia&gt; k = reshape(k, 3, N_c, N_t);
 
 julia&gt; k = permutedims(k, (1, 3, 2));
 
-julia&gt; k = reshape(k, 3, nCyc*nFA)
+julia&gt; k = reshape(k, 3, N_c*N_t)
 3×50 Matrix{Float64}:
  1.0          -0.802397   0.334292  …  -0.762115  0.866723  -0.531067
  0.0           0.498671  -0.676983     -0.62806   0.116138   0.238983
  6.12323e-17   0.32785    0.6557        0.15723   0.48508    0.81293
 
-julia&gt; order = reshape(Int32.(1:(nCyc*nFA)), nFA, nCyc)
+julia&gt; order = reshape(Int32.(1:(N_c*N_t)), N_t, N_c)
 10×5 Matrix{Int32}:
   1  11  21  31  41
   2  12  22  32  42
@@ -52,4 +52,97 @@ julia&gt; SimulatedAnneling!(k, order; N_iter=10)
   8  18  28  38  48
   9  19  29  39  49
  10  20  40  30  50
-</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl/blob/4506ac54f3743cb6c19e490eaa18ec5cf80f6aa0/src/main_functions.jl#L76-L151">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../build_literate/tutorial/">« Tutorial</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.10 on <span class="colophon-date" title="Saturday 30 October 2021 01:45">Saturday 30 October 2021</span>. Using Julia version 1.6.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl/blob/fa3e563a34c022c4871a1cbca3669637aa0d132d/src/main_functions.jl#L208-L282">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="MRIeddyCurrentOptimization.cost-Tuple{Any, Any}" href="#MRIeddyCurrentOptimization.cost-Tuple{Any, Any}"><code>MRIeddyCurrentOptimization.cost</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia hljs">cost(k, order; p=3, w_even=1)</code></pre><p>Calculates the cost of the trajectory <code>k</code> when acquired in the order <code>order</code>.</p><p><strong>Arguemnts</strong></p><p><strong>Required</strong></p><ul><li><code>k::Matrix{Number}</code>: 3 x (N<em>t N</em>c) matrix containing the [x,y,z] coordinates of the first data point of each spoke</li><li><code>order::Matrix{Int}</code>: N<em>t x N</em>c matrix containing the indices in which the spokes in <code>k</code> are acquired. </li></ul><p><strong>Optional</strong></p><ul><li><code>p::Number</code>: exponent to scale the squared-Euclidean distance. Default is <code>p=3</code>, which is equivalent to <code>p=6</code> in the paper, as the Euclidean distance is already squared. </li><li><code>w_even::Number</code>: weighting factor of the even jumps. The default is <code>w_even=1</code> which weights even and odd jumps equally. Set <code>w_even=0</code> for Bieri&#39;s paring approch. </li></ul><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; using MRIeddyCurrentOptimization
+
+julia&gt; N_t  = 10;
+
+julia&gt; N_c = 5;
+
+julia&gt; theta = acos.(((0:(N_c * N_t - 1)) * 0.46557) .% 1);
+
+julia&gt; phi = Float64.(0:(N_c * N_t - 1)) * 2 * pi * 0.6823;
+
+julia&gt; k = zeros(3, length(theta));
+
+julia&gt; k[3,:] = cos.(theta);
+
+julia&gt; k[2,:] = sin.(theta) .* sin.(phi);
+
+julia&gt; k[1,:] = sin.(theta) .* cos.(phi);
+
+julia&gt; k = reshape(k, 3, N_c, N_t);
+
+julia&gt; k = permutedims(k, (1, 3, 2));
+
+julia&gt; k = reshape(k, 3, N_c*N_t)
+3×50 Matrix{Float64}:
+ 1.0          -0.802397   0.334292  …  -0.762115  0.866723  -0.531067
+ 0.0           0.498671  -0.676983     -0.62806   0.116138   0.238983
+ 6.12323e-17   0.32785    0.6557        0.15723   0.48508    0.81293
+
+julia&gt; order = reshape(Int32.(1:(N_c*N_t)), N_t, N_c)
+10×5 Matrix{Int32}:
+  1  11  21  31  41
+  2  12  22  32  42
+  3  13  23  33  43
+  4  14  24  34  44
+  5  15  25  35  45
+  6  16  26  36  46
+  7  17  27  37  47
+  8  18  28  38  48
+  9  19  29  39  49
+ 10  20  30  40  50
+
+julia&gt; cost(k, order)
+953.5601055273712
+
+julia&gt; cost(k, order; p=1, w_even=0)
+63.2591698560959
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl/blob/fa3e563a34c022c4871a1cbca3669637aa0d132d/src/main_functions.jl#L1-L65">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="MRIeddyCurrentOptimization.delta_cost-NTuple{5, Any}" href="#MRIeddyCurrentOptimization.delta_cost-NTuple{5, Any}"><code>MRIeddyCurrentOptimization.delta_cost</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia hljs">delta_cost(k, order, t, c, c̃[; p=3, w_even=1])
+delta_cost(k, order, t, N_t, c, c̃, p, w_even)</code></pre><p>Calculates the change in the cost when swapping the k-space spokes in the <code>c</code>th and <code>c̃</code>th cycles for the <code>t</code>th flip angle. </p><p><strong>Arguemnts</strong></p><p><strong>Required</strong></p><ul><li><code>k::Matrix{Number}</code>: 3 x (N<em>t N</em>c) matrix containing the [x,y,z] coordinates of the first data point of each spoke</li><li><code>order::Matrix{Int}</code>: N<em>t x N</em>c matrix containing the indices in which the spokes in <code>k</code> are acquired. </li><li><code>t::Int</code>: index of the flip angle. Must be in the range [1, size(order,1)].</li><li><code>c::Int</code>: index of the first cycle. Must be in the range [1, size(order,2)].</li><li><code>c̃::Int</code>: index of the second cycle. Must be in the range [1, size(order,2)].</li></ul><p><strong>Optional</strong></p><ul><li><code>p::Number</code>: exponent to scale the squared-Euclidean distance. Default is <code>p=3</code>, which is equivalent to <code>p=6</code> in the paper, as the Euclidean distance is already squared. </li><li><code>w_even::Number</code>: weighting factor of the even jumps. The default is <code>w_even=1</code> which weights even and odd jumps equally. Set <code>w_even=0</code> for Bieri&#39;s paring approch. </li></ul><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; using MRIeddyCurrentOptimization
+
+julia&gt; N_t  = 10;
+
+julia&gt; N_c = 5;
+
+julia&gt; theta = acos.(((0:(N_c * N_t - 1)) * 0.46557) .% 1);
+
+julia&gt; phi = Float64.(0:(N_c * N_t - 1)) * 2 * pi * 0.6823;
+
+julia&gt; k = zeros(3, length(theta));
+
+julia&gt; k[3,:] = cos.(theta);
+
+julia&gt; k[2,:] = sin.(theta) .* sin.(phi);
+
+julia&gt; k[1,:] = sin.(theta) .* cos.(phi);
+
+julia&gt; k = reshape(k, 3, N_c, N_t);
+
+julia&gt; k = permutedims(k, (1, 3, 2));
+
+julia&gt; k = reshape(k, 3, N_c*N_t)
+3×50 Matrix{Float64}:
+ 1.0          -0.802397   0.334292  …  -0.762115  0.866723  -0.531067
+ 0.0           0.498671  -0.676983     -0.62806   0.116138   0.238983
+ 6.12323e-17   0.32785    0.6557        0.15723   0.48508    0.81293
+
+julia&gt; order = reshape(Int32.(1:(N_c*N_t)), N_t, N_c)
+10×5 Matrix{Int32}:
+  1  11  21  31  41
+  2  12  22  32  42
+  3  13  23  33  43
+  4  14  24  34  44
+  5  15  25  35  45
+  6  16  26  36  46
+  7  17  27  37  47
+  8  18  28  38  48
+  9  19  29  39  49
+ 10  20  30  40  50
+
+julia&gt; delta_cost(k, order, 7, 2, 4)
+-110.52694915027755
+
+julia&gt; delta_cost(k, order, 7, 2, 4; p=5, w_even=0)
+-1033.0264683547257
+</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl/blob/fa3e563a34c022c4871a1cbca3669637aa0d132d/src/main_functions.jl#L73-L141">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../build_literate/tutorial/">« Home</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.10 on <span class="colophon-date" title="Saturday 30 October 2021 22:05">Saturday 30 October 2021</span>. Using Julia version 1.6.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
