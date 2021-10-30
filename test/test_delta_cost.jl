@@ -4,8 +4,8 @@ using BenchmarkTools
 using Test
 
 # Define number of flip angles and cycles
-N_t = 571
-N_c = 872;
+Nt = 571
+Nc = 872;
 
 # calculate 2D golden means
 s, v = eigen([0 1 0; 0 0 1; 1 0 1])
@@ -15,24 +15,24 @@ s, v = eigen([0 1 0; 0 0 1; 1 0 1])
 ϕ₂ = real(v[2,end] / v[end,end])
 
 # set up 3D radial koosh ball trajectory
-theta = acos.(((0:(N_c * N_t - 1)) * ϕ₁) .% 1)
-phi = Float64.(0:(N_c * N_t - 1)) * 2 * pi * ϕ₂
+θ = acos.(((0:(Nc * Nt - 1)) * ϕ₁) .% 1)
+φ = Float64.(0:(Nc * Nt - 1)) * 2 * pi * ϕ₂
 
-k = zeros(3, length(theta))
-k[3,:] = cos.(theta)
-k[2,:] = sin.(theta) .* sin.(phi)
-k[1,:] = sin.(theta) .* cos.(phi)
+k = zeros(3, length(θ))
+k[3,:] = cos.(θ)
+k[2,:] = sin.(θ) .* sin.(φ)
+k[1,:] = sin.(θ) .* cos.(φ)
 
-k = reshape(k, 3, N_c, N_t)
+k = reshape(k, 3, Nc, Nt)
 k = permutedims(k, (1, 3, 2))
-k = reshape(k, 3, N_c * N_t);
+k = reshape(k, 3, Nc * Nt);
 
 # Set number of iterations
 N = 10_000_000
 
 # initalize with linear order
-order = Int32.(1:(N_c * N_t))
-order = reshape(order, N_t, N_c)
+order = Int32.(1:(Nc * Nt))
+order = reshape(order, Nt, Nc)
 
 # choose values to change
 t = 5
