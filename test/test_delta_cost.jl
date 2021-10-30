@@ -4,8 +4,8 @@ using BenchmarkTools
 using Test
 
 # Define number of flip angles and cycles
-nFA = 571
-nCyc = 872;
+N_t = 571
+N_c = 872;
 
 # calculate 2D golden means
 s, v = eigen([0 1 0; 0 0 1; 1 0 1])
@@ -15,40 +15,40 @@ GA1 = real(v[1,end] / v[end,end])
 GA2 = real(v[2,end] / v[end,end])
 
 # set up 3D radial koosh ball trajectory
-theta = acos.(((0:(nCyc * nFA - 1)) * GA1) .% 1)
-phi = Float64.(0:(nCyc * nFA - 1)) * 2 * pi * GA2
+theta = acos.(((0:(N_c * N_t - 1)) * GA1) .% 1)
+phi = Float64.(0:(N_c * N_t - 1)) * 2 * pi * GA2
 
 k = zeros(3, length(theta))
 k[3,:] = cos.(theta)
 k[2,:] = sin.(theta) .* sin.(phi)
 k[1,:] = sin.(theta) .* cos.(phi)
 
-k = reshape(k, 3, nCyc, nFA)
+k = reshape(k, 3, N_c, N_t)
 k = permutedims(k, (1, 3, 2))
-k = reshape(k, 3, nCyc * nFA);
+k = reshape(k, 3, N_c * N_t);
 
 # Set number of iterations
 N = 10_000_000
 
 # initalize with linear order
-order = Int32.(1:(nCyc * nFA))
-order = reshape(order, nFA, nCyc)
+order = Int32.(1:(N_c * N_t))
+order = reshape(order, N_t, N_c)
 
 # choose values to change
-iFA = 5
-iC1 = 10
-iC2 = 20
+t = 5
+c = 10
+c̃ = 20
 
 # calculate delta cost
-ΔF = delta_cost(k, order, iFA, iC1, iC2)
+ΔF = delta_cost(k, order, t, c, c̃)
 
 # calculate original cost
 F0 = cost(k, order)
 
 # change 
-tmp = order[iFA,iC2]
-order[iFA,iC2] = order[iFA,iC1]
-order[iFA,iC1] = tmp
+tmp = order[t,c̃]
+order[t,c̃] = order[t,c]
+order[t,c] = tmp
 
 # calculate changed cost
 F1 = cost(k, order)
@@ -65,7 +65,7 @@ F2 = cost(k, order)
 
 ## benchmark 
 print("Benchmark the call of delta_cost. This should be 0 allocations and around 22ns (on my 2015 i7):")
-@btime delta_cost($k, $order, $iFA, $iC1, $iC2)
+@btime delta_cost($k, $order, $t, $c, $c̃)
 
-a = @benchmark delta_cost($k, $order, $iFA, $iC1, $iC2)
+a = @benchmark delta_cost($k, $order, $t, $c, $c̃)
 @test a.allocs == 0

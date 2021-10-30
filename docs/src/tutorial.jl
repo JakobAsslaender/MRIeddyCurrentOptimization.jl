@@ -2,7 +2,7 @@
 
 # # Tutorial
 
-# The core of generalized Bloch model is implemented in the function [`apply_hamiltonian_gbloch!(∂m∂t, m, mfun, p, t)`](@ref), which calculates the derivative `∂m/∂t` for a given magnetization vector `m` and stores it in-place in the the variable `∂m∂t`. The function interface is written in a way that we can directly feed it into a differential equation solver of the [DifferentialEquations.jl](https://diffeq.sciml.ai/stable/) package.
+# The core of generalized Bloch model is implemented in the function [`apply_hamiltonian_gbloch!`](@ref), which calculates the derivative `∂m/∂t` for a given magnetization vector `m` and stores it in-place in the the variable `∂m∂t`. The function interface is written in a way that we can directly feed it into a differential equation solver of the [DifferentialEquations.jl](https://diffeq.sciml.ai/stable/) package.
 
 # For this example, we need the following packages:
 using MRIeddyCurrentOptimization
@@ -11,8 +11,8 @@ using LinearAlgebra
 using Random
 
 # Define number of flip angles and cycles
-nFA = 571
-nCyc = 872;
+N_t = 974
+N_c = 94;
 
 # calculate 2D golden means
 s, v = eigen([0 1 0; 0 0 1; 1 0 1])
@@ -22,24 +22,24 @@ GA1 = real(v[1,end] / v[end,end])
 GA2 = real(v[2,end] / v[end,end])
 
 # set up 3D radial koosh ball trajectory
-theta = acos.(((0:(nCyc * nFA - 1)) * GA1) .% 1)
-phi = (0:(nCyc * nFA - 1)) * 2 * pi * GA2
+theta = acos.(((0:(N_c * N_t - 1)) * GA1) .% 1)
+phi = (0:(N_c * N_t - 1)) * 2 * pi * GA2
 
 k = zeros(3, length(theta))
 k[3,:] = cos.(theta)
 k[2,:] = sin.(theta) .* sin.(phi)
 k[1,:] = sin.(theta) .* cos.(phi)
 
-k = reshape(k, 3, nCyc, nFA)
+k = reshape(k, 3, N_c, N_t)
 k = permutedims(k, (1, 3, 2))
-k = reshape(k, 3, nCyc*nFA);
+k = reshape(k, 3, N_c*N_t);
 
 # Set number of iterations
 N = 10_000_000
 
 # initalize with linear order
-order = Int32.(1:(nCyc*nFA))
-order = reshape(order, nFA, nCyc)
+order = Int32.(1:(N_c*N_t))
+order = reshape(order, N_t, N_c)
 
 # calculate initial cost
 cost(k,order)
