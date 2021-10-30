@@ -48,7 +48,7 @@ end
 DocMeta.setdocmeta!(MRIeddyCurrentOptimization, :DocTestSetup, :(using MRIeddyCurrentOptimization); recursive=true)
 
 makedocs(;
-    doctest = false,
+    doctest = true,
     modules=[MRIeddyCurrentOptimization],
     authors="Jakob Asslaender <jakob.asslaender@nyumc.org> and contributors",
     repo="https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl/blob/{commit}{path}#{line}",

@@ -1,5 +1,4 @@
 using MRIeddyCurrentOptimization
-using MRIeddyCurrentOptimization: cost, delta_cost
 using LinearAlgebra
 using BenchmarkTools
 using Test
@@ -19,11 +18,6 @@ GA2 = real(v[2,end] / v[end,end])
 theta = acos.(((0:(nCyc * nFA - 1)) * GA1) .% 1)
 phi = Float64.(0:(nCyc * nFA - 1)) * 2 * pi * GA2
 
-theta = reshape(theta, nCyc, nFA)
-phi   = reshape(phi, nCyc, nFA)
-theta = vec(theta)
-phi   = vec(phi)
-
 k = zeros(3, length(theta))
 k[3,:] = cos.(theta)
 k[2,:] = sin.(theta) .* sin.(phi)
@@ -31,7 +25,7 @@ k[1,:] = sin.(theta) .* cos.(phi)
 
 k = reshape(k, 3, nCyc, nFA)
 k = permutedims(k, (1, 3, 2))
-kv = reshape(k, 3, nCyc * nFA);
+k = reshape(k, 3, nCyc * nFA);
 
 # Set number of iterations
 N = 10_000_000
@@ -46,10 +40,10 @@ iC1 = 10
 iC2 = 20
 
 # calculate delta cost
-Δc = delta_cost(kv, order, iFA, nFA, iC1, iC2)
+ΔF = delta_cost(k, order, iFA, iC1, iC2)
 
 # calculate original cost
-c0 = cost(kv, order)
+F0 = cost(k, order)
 
 # change 
 tmp = order[iFA,iC2]
@@ -57,21 +51,21 @@ order[iFA,iC2] = order[iFA,iC1]
 order[iFA,iC1] = tmp
 
 # calculate changed cost
-c1 = cost(kv, order)
+F1 = cost(k, order)
 
 # test
-@test (c1 - c0) ≈ Δc
+@test (F1 - F0) ≈ ΔF
 
 # call simulated annealing algorithm that changes the order in place (as indicated by the ! at the end of the function call)
-SimulatedAnneling!(kv, order, N, nFA, nCyc)
+SimulatedAnneling!(k, order; N_iter=N)
 
 ## Test that the cost has decreased
-c2 = cost(kv, order)
-@test c2 < c1
+F2 = cost(k, order)
+@test F2 < F1
 
 ## benchmark 
 print("Benchmark the call of delta_cost. This should be 0 allocations and around 22ns (on my 2015 i7):")
-@btime delta_cost($kv, $order, $iFA, $nFA, $iC1, $iC2)
+@btime delta_cost($k, $order, $iFA, $iC1, $iC2)
 
-a = @benchmark delta_cost($kv, $order, $iFA, $nFA, $iC1, $iC2)
+a = @benchmark delta_cost($k, $order, $iFA, $iC1, $iC2)
 @test a.allocs == 0
