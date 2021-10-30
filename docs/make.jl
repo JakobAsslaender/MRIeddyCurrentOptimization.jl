@@ -6,7 +6,7 @@ Pkg.instantiate()
 using MRIeddyCurrentOptimization
 using Documenter
 using Literate
-# using Plots # to not capture precompilation output
+using Plots # to not capture precompilation output
 
 # HTML Plotting Functionality
 struct HTMLPlot
@@ -50,7 +50,7 @@ DocMeta.setdocmeta!(MRIeddyCurrentOptimization, :DocTestSetup, :(using MRIeddyCu
 makedocs(;
     doctest = true,
     modules=[MRIeddyCurrentOptimization],
-    authors="Jakob Asslaender <jakob.asslaender@nyumc.org> and contributors",
+    authors="Jakob Asslaender <jakob.asslaender@nyumc.org> and Sebastian Flassbeck <sebastian.flassbeck@nyumc.org>",
     repo="https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl/blob/{commit}{path}#{line}",
     sitename="MRIeddyCurrentOptimization.jl",
     format=Documenter.HTML(;
@@ -59,14 +59,14 @@ makedocs(;
         assets=String[],
     ),
     pages=[
-        "Home" => "index.md",
-        "Tutorial" => "build_literate/tutorial.md",
+        # "Home" => "index.md",
+        "Home" => "build_literate/tutorial.md",
         "API" => "api.md",
     ],
 )
 
 # Set dark theme as default independent of the OS's settings
-# run(`sed -i'.old' 's/var darkPreference = false/var darkPreference = true/g' docs/build/assets/themeswap.js`)
+run(`sed -i'.old' 's/var darkPreference = false/var darkPreference = true/g' docs/build/assets/themeswap.js`)
 
 deploydocs(;
     repo="github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl",

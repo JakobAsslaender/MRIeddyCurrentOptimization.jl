@@ -9,14 +9,14 @@ N_c = 872;
 
 # calculate 2D golden means
 s, v = eigen([0 1 0; 0 0 1; 1 0 1])
-GA1 = real(v[1,end] / v[end,end])
+ϕ₁ = real(v[1,end] / v[end,end])
 
 # second one
-GA2 = real(v[2,end] / v[end,end])
+ϕ₂ = real(v[2,end] / v[end,end])
 
 # set up 3D radial koosh ball trajectory
-theta = acos.(((0:(N_c * N_t - 1)) * GA1) .% 1)
-phi = Float64.(0:(N_c * N_t - 1)) * 2 * pi * GA2
+theta = acos.(((0:(N_c * N_t - 1)) * ϕ₁) .% 1)
+phi = Float64.(0:(N_c * N_t - 1)) * 2 * pi * ϕ₂
 
 k = zeros(3, length(theta))
 k[3,:] = cos.(theta)

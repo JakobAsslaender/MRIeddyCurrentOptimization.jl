@@ -1,5 +1,5 @@
 ```@meta
-Author = "Jakob Assländer"
+Authors = "Jakob Assländer and Sebastian Flassbeck"
 CurrentModule = MRIeddyCurrentOptimization
 ```
 
