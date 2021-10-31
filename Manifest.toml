@@ -378,11 +378,11 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[MRIeddyCurrentOptimization]]
 deps = ["Random"]
-git-tree-sha1 = "9f209a6e686428650d3e6b3251780810acad72a4"
+git-tree-sha1 = "d8e2c47d2e771d72fb3a6954a86c6003d925eb94"
 repo-rev = "master"
 repo-url = "https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl"
 uuid = "946b6108-32ee-4d26-96fa-04da7940ef18"
-version = "0.1.0"
+version = "0.2.0"
 
 [[MacroTools]]
 deps = ["Markdown", "Random"]
