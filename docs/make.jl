@@ -19,9 +19,9 @@ function Base.show(io::IO, ::MIME"text/html", p::HTMLPlot)
     path = joinpath(PLOT_DIR, string(UInt32(floor(rand()*1e9)), ".html"))
     Plots.savefig(p.p, path)
     if get(ENV, "CI", "false") == "true" # for prettyurl
-        print(io, "<object type=\"text/html\" data=\"../../$(relpath(path, ROOT_DIR))\" style=\"width:100%;height:425px;\"></object>")
-    else
         print(io, "<object type=\"text/html\" data=\"../$(relpath(path, ROOT_DIR))\" style=\"width:100%;height:425px;\"></object>")
+    else
+        print(io, "<object type=\"text/html\" data=\"$(relpath(path, ROOT_DIR))\" style=\"width:100%;height:425px;\"></object>")
     end
 end
 
@@ -35,7 +35,7 @@ end
 OUTPUT = joinpath(@__DIR__, "src/build_literate")
 
 files = [
-    "tutorial.jl",
+    "index.jl",
 ]
 
 for file in files
@@ -44,6 +44,10 @@ for file in files
     Literate.notebook(file_path, OUTPUT, preprocess=notebook_filter; execute=false)
     Literate.script(  file_path, OUTPUT)
 end
+
+src = joinpath(@__DIR__, "src/build_literate/index.md")
+tar = joinpath(@__DIR__, "src/index.md")
+run(`mv $src $tar`)
 
 DocMeta.setdocmeta!(MRIeddyCurrentOptimization, :DocTestSetup, :(using MRIeddyCurrentOptimization); recursive=true)
 
@@ -59,8 +63,8 @@ makedocs(;
         assets=String[],
     ),
     pages=[
-        # "Home" => "index.md",
-        "Home" => "build_literate/tutorial.md",
+        "Home" => "index.md",
+        # "Home" => "build_literate/tutorial.md",
         "API" => "api.md",
     ],
 )
