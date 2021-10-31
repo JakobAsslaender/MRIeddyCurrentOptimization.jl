@@ -8,6 +8,10 @@
 
 MRIeddyCurrentOptimization.jl is a Julia package that implements a simulated annealing algorithm to re-order k-space line for minimal eddy current artifacts. 
 
+To install this package, enter the Julia package manager by typing `]` in the REPL and then calling the command:
+
+`add https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl`
+
 For more details, please refer to the [paper](https://TODO.url) and the above linked documentation.
 
 
