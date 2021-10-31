@@ -1,7 +1,7 @@
 name = "MRIeddyCurrentOptimization"
 uuid = "946b6108-32ee-4d26-96fa-04da7940ef18"
 authors = ["Jakob Asslaender <jakob.asslaender@nyumc.org> and Sebastian Flassbeck <sebastian.flassbeck@nyumc.org>"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
