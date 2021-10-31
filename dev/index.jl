@@ -7,7 +7,7 @@
 #md # Documentation for the [MRIeddyCurrentOptimization.jl](https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl) package, which implements a simulated annealing algorithm to re-order k-space lines for minimal eddy current artifacts. The approach is describe in detail in the corresponding [paper](https://TODO.url). In the following, we give a brief tutorial. The documentation of all exported functions can be found in the [API](@ref) Section. 
 
 # ## Tutorial
-#md # [![](https://mybinder.org/badge_logo.svg)](@__BINDER_ROOT_URL__/build_literate/tutorial.ipynb)
+#md # [![](https://mybinder.org/badge_logo.svg)](@__BINDER_ROOT_URL__/build_literate/index.ipynb)
 
 # The main function is [`SimulatedAnneling!(k, order)`](@ref), which, for a given k-space trajectory `k`, optimizes the index matrix `order`. The function randomly chooses a timepoint `t` of the spin dynamics and, within `t`, attempts to swap the two random cylce indices `c` and `c̃`. If the swap is beneficial, the indices are swapped. In line with the simulated annealing theory, even unbeneficial swaps are performed with a certain probabilty that is comparably high in the first iterations and goes to zero for later iterations. In the following, we explain the interface of the package at the example of the optimization used in the paper where we optimize a 3D radial koosh-ball trajectry. 
 
