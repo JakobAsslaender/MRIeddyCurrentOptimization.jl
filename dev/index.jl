@@ -20,10 +20,10 @@ using Plots
 plotlyjs(bg=RGBA(31 / 255, 36 / 255, 36 / 255, 1.0), ticks=:native); # hide #md
 
 # We define number of time points in our spin dynamics (i.e. the number of RF-pulses)
-N_t = 975;
+Nt = 975;
 
 # as well as the number of cycles that we want to acquire
-N_c = 94;
+Nc = 94;
 
 # Like in the paper, we use the 2D golden means trajectory proposed by [Chan et al.](https://doi.org/10.1002/mrm.21837), which can be calculated with an eigendecomposition. The first golden mean is
 s, v = eigen([0 1 0; 0 0 1; 1 0 1])
@@ -33,8 +33,8 @@ s, v = eigen([0 1 0; 0 0 1; 1 0 1])
 ϕ₂ = real(v[2,end] / v[end])
 
 # With the golden means we calcualte the angles of the k-space spokes:
-θ = acos.(((0:(N_c * N_t - 1)) * ϕ₁) .% 1)
-φ = (0:(N_c * N_t - 1)) * 2π * ϕ₂;
+θ = acos.(((0:(Nc * Nt - 1)) * ϕ₁) .% 1)
+φ = (0:(Nc * Nt - 1)) * 2π * ϕ₂;
 
 # and calculate the k-space trajectory:
 k = zeros(3, length(θ))
@@ -42,14 +42,14 @@ k[3,:] = cos.(θ)
 k[2,:] = sin.(θ) .* sin.(φ)
 k[1,:] = sin.(θ) .* cos.(φ);
 
-# As discussed in the paper, a near-optimal k-space coverage is achieved by binning the first `N_c` angles into the first time point `t₁`, the next `N_c` angles into the second time point `t₂` and so forth. Hence, we need to permute the dimensions of the k-space trajectory to re-order the spokes:
-k = reshape(k, 3, N_c, N_t)
+# As discussed in the paper, a near-optimal k-space coverage is achieved by binning the first `Nc` angles into the first time point `t₁`, the next `Nc` angles into the second time point `t₂` and so forth. Hence, we need to permute the dimensions of the k-space trajectory to re-order the spokes:
+k = reshape(k, 3, Nc, Nt)
 k = permutedims(k, (1, 3, 2))
-k = reshape(k, 3, N_c*N_t);
+k = reshape(k, 3, Nc*Nt);
 
 # Here, we initialize the simulated annealing algorithm with the *default*, i.e., with a linear ordering scheme:
-order = Int32.(1:(N_c*N_t))
-order = reshape(order, N_t, N_c)
+order = Int32.(1:(Nc*Nt))
+order = reshape(order, Nt, Nc)
 
 # The cost of this order, with the package's default cost function (`p=3`, which is equivalent to `p=6` in the paper due to an additional squaring, and with `w_even=1`, i.e., with equal weights on even and odd jumps) is given by
 cost(k,order)
@@ -75,7 +75,7 @@ cost(k,order)
 histogram!(p, Δk, bins=(0:0.01:1.5), label = "optimized ordering")
 #md Main.HTMLPlot(p) #hide
 
-# ### Benchmarking
+# ## Benchmarking
 # Last but not least, we can benchmark the code and verify that the code is non-allocating:
 N = 1_000
 @benchmark SimulatedAnneling!($k, $order, N_iter=$N, rng = $(MersenneTwister(12345)))

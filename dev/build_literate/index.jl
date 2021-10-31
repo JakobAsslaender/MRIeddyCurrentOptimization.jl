@@ -4,29 +4,29 @@ using LinearAlgebra
 using Random
 using Plots
 
-N_t = 975;
+Nt = 975;
 
-N_c = 94;
+Nc = 94;
 
 s, v = eigen([0 1 0; 0 0 1; 1 0 1])
 ϕ₁ = real(v[1,end] / v[end])
 
 ϕ₂ = real(v[2,end] / v[end])
 
-θ = acos.(((0:(N_c * N_t - 1)) * ϕ₁) .% 1)
-φ = (0:(N_c * N_t - 1)) * 2π * ϕ₂;
+θ = acos.(((0:(Nc * Nt - 1)) * ϕ₁) .% 1)
+φ = (0:(Nc * Nt - 1)) * 2π * ϕ₂;
 
 k = zeros(3, length(θ))
 k[3,:] = cos.(θ)
 k[2,:] = sin.(θ) .* sin.(φ)
 k[1,:] = sin.(θ) .* cos.(φ);
 
-k = reshape(k, 3, N_c, N_t)
+k = reshape(k, 3, Nc, Nt)
 k = permutedims(k, (1, 3, 2))
-k = reshape(k, 3, N_c*N_t);
+k = reshape(k, 3, Nc*Nt);
 
-order = Int32.(1:(N_c*N_t))
-order = reshape(order, N_t, N_c)
+order = Int32.(1:(Nc*Nt))
+order = reshape(order, Nt, Nc)
 
 cost(k,order)
 
