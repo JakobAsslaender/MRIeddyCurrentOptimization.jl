@@ -20,7 +20,7 @@ using Plots
 plotlyjs(bg=RGBA(31 / 255, 36 / 255, 36 / 255, 1.0), ticks=:native); # hide #md
 
 # We define number of time points in our spin dynamics (i.e. the number of RF-pulses)
-Nt = 975;
+Nt = 981;
 
 # as well as the number of cycles that we want to acquire
 Nc = 94;
@@ -57,7 +57,7 @@ cost(k,order)
 # We can visualize inital cost by plotting a histogram of the Euclidean distances:
 Δk = k[:,order[1:end - 1]] - k[:,order[2:end]]
 Δk = vec(reduce(+, Δk.^2, dims=1))
-p = histogram(Δk, bins=(0:0.01:1.5), xlabel="Euclidean distance on the unity sphere", ylabel="Number of occurrencess", label = "default ordering")
+p = histogram(Δk, bins=(0:0.01:1.5), xlabel="Euclidean distance", ylabel="Number of occurrencess", label = "default ordering")
 #md Main.HTMLPlot(p) #hide
 
 # Like in the paper, we use a fixed 1 billion iterations:
@@ -72,7 +72,7 @@ cost(k,order)
 # The redueced cost is also reflected in the histogram of the spherical distance:
 Δk = k[:,order[1:end - 1]] - k[:,order[2:end]]
 Δk = vec(reduce(+, Δk.^2, dims=1))
-histogram!(p, Δk, bins=(0:0.01:1.5), label = "optimized ordering")
+histogram!(p, Δk, bins=(0:0.01:1.5), label = "Uniform weighting")
 #md Main.HTMLPlot(p) #hide
 
 # ## Benchmarking

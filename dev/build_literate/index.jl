@@ -4,7 +4,7 @@ using LinearAlgebra
 using Random
 using Plots
 
-Nt = 975;
+Nt = 981;
 
 Nc = 94;
 
@@ -32,7 +32,7 @@ cost(k,order)
 
 Δk = k[:,order[1:end - 1]] - k[:,order[2:end]]
 Δk = vec(reduce(+, Δk.^2, dims=1))
-p = histogram(Δk, bins=(0:0.01:1.5), xlabel="Euclidean distance on the unity sphere", ylabel="Number of occurrencess", label = "default ordering")
+p = histogram(Δk, bins=(0:0.01:1.5), xlabel="Euclidean distance", ylabel="Number of occurrencess", label = "default ordering")
 
 N = 1_000_000_000;
 
@@ -42,7 +42,7 @@ cost(k,order)
 
 Δk = k[:,order[1:end - 1]] - k[:,order[2:end]]
 Δk = vec(reduce(+, Δk.^2, dims=1))
-histogram!(p, Δk, bins=(0:0.01:1.5), label = "optimized ordering")
+histogram!(p, Δk, bins=(0:0.01:1.5), label = "Uniform weighting")
 
 N = 1_000
 @benchmark SimulatedAnneling!($k, $order, N_iter=$N, rng = $(MersenneTwister(12345)))
