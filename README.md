@@ -12,7 +12,7 @@ To install this package, enter the Julia package manager by typing `]` in the RE
 
 `add https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl`
 
-For more details, please refer to the [paper](https://TODO.url) and the above linked documentation.
+For more details, please refer to the [paper](https://arxiv.org/pdf/2203.06099.pdf) and the above linked documentation.
 
 
 [docs-img]: https://img.shields.io/badge/docs-latest%20release-blue.svg
@@ -24,5 +24,5 @@ For more details, please refer to the [paper](https://TODO.url) and the above li
 [codecov-img]: https://codecov.io/gh/JakobAsslaender/MRIeddyCurrentOptimization.jl/branch/master/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/JakobAsslaender/MRIeddyCurrentOptimization.jl
 
-[paper-img]: https://img.shields.io/badge/arXiv-TODO-blue.svg
-[paper-url]: https://TODO.url
+[paper-img]: https://img.shields.io/badge/arXiv-2203.06099-blue.svg
+[paper-url]: https://arxiv.org/pdf/2203.06099.pdf
