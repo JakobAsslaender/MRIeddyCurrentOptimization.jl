@@ -55,13 +55,8 @@ makedocs(;
     doctest = true,
     modules=[MRIeddyCurrentOptimization],
     authors="Jakob Asslaender <jakob.asslaender@nyumc.org> and Sebastian Flassbeck <sebastian.flassbeck@nyumc.org>",
-    repo="https://github.com/JakobAsslaender/MRIeddyCurrentOptimization.jl/blob/{commit}{path}#{line}",
     sitename="MRIeddyCurrentOptimization.jl",
-    format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://JakobAsslaender.github.io/MRIeddyCurrentOptimization.jl",
-        assets=String[],
-    ),
+    format=Documenter.HTML(; prettyurls=get(ENV, "CI", "false") == "true"),
     pages=[
         "Home" => "index.md",
         # "Home" => "build_literate/tutorial.md",
