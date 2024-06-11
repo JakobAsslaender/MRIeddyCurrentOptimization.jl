@@ -296,8 +296,8 @@ function SimulatedAnneling!(k, order; N_iter=1_000_000_000, p=3, w_even=1, rng =
             order[t,c̃] = order[t,c]
             order[t,c] = tmp
         end
-        if verbose && ii % (N / 100) == 0
-            println(string(round(ii / N * 1e2), "% completed; cost = ", cost(k, order, p=p, w_even=w_even)))
+        if verbose && ii % (N_iter / 100) == 0
+            println(string(round(ii / N_iter * 1e2), "% completed; cost = ", cost(k, order, p=p, w_even=w_even)))
             flush(stdout)
         end
     end
