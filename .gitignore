@@ -4,5 +4,6 @@ scripts/*
 docs/build
 docs/src/build*
 docs/src/index.md
-docs/Manifest.toml
+Manifest.toml
+*/Manifest.toml
 .DS_Store
