@@ -34,19 +34,15 @@ end
 # Literate
 OUTPUT = joinpath(@__DIR__, "src/build_literate")
 
-files = [
-    "index.jl",
-]
-
-for file in files
-    file_path = joinpath(@__DIR__, "src/", file)
-    Literate.markdown(file_path, OUTPUT)
-    Literate.notebook(file_path, OUTPUT, preprocess=notebook_filter; execute=false)
-    Literate.script(  file_path, OUTPUT)
-end
+file_path = joinpath(@__DIR__, "src/index.jl")
+Literate.markdown(file_path, OUTPUT)
+Literate.notebook(file_path, OUTPUT, preprocess=notebook_filter; execute=false)
+Literate.script(  file_path, OUTPUT)
 
 src = joinpath(@__DIR__, "src/build_literate/index.md")
 tar = joinpath(@__DIR__, "src/index.md")
+text = read(src, String)
+write(src, replace(text, "EditURL = \"../index.jl\"" => "EditURL = \"index.jl\""))
 run(`mv $src $tar`)
 
 DocMeta.setdocmeta!(MRIeddyCurrentOptimization, :DocTestSetup, :(using MRIeddyCurrentOptimization); recursive=true)
@@ -60,7 +56,6 @@ makedocs(;
     format=Documenter.HTML(; prettyurls=get(ENV, "CI", "false") == "true"),
     pages=[
         "Home" => "index.md",
-        # "Home" => "build_literate/tutorial.md",
         "API" => "api.md",
     ],
 )
