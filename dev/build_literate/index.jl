@@ -48,4 +48,3 @@ N = 1_000
 @benchmark SimulatedAnneling!($k, $order, N_iter=$N, rng = $(MersenneTwister(12345)))
 
 # This file was generated using Literate.jl, https://github.com/fredrikekre/Literate.jl
-
