@@ -1,8 +1,20 @@
 # This file is machine-generated - editing it directly is not advised
 
-[[Random]]
-deps = ["Serialization"]
-uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+julia_version = "1.13.4"
+manifest_format = "2.1"
+project_hash = "8bcd24612e9962a95bb671172c29a0c061de23e1"
 
-[[Serialization]]
-uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+[[deps.MRIeddyCurrentOptimization]]
+deps = ["Random"]
+path = "."
+uuid = "946b6108-32ee-4d26-96fa-04da7940ef18"
+version = "0.2.1"
+
+[[deps.Random]]
+deps = ["SHA"]
+uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+version = "1.11.0"
+
+[[deps.SHA]]
+uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+version = "1.0.0"
