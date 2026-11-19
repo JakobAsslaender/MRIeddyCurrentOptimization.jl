@@ -53,6 +53,7 @@ DocMeta.setdocmeta!(MRIeddyCurrentOptimization, :DocTestSetup, :(using MRIeddyCu
 
 makedocs(;
     doctest = true,
+    doctestfilters = [r"\s*-?(\d+)\.(\d{4})\d*\s*"], # Ignore any digit after the 4th digit after a decimal, throughout the docs
     modules=[MRIeddyCurrentOptimization],
     authors="Jakob Asslaender <jakob.asslaender@nyumc.org> and Sebastian Flassbeck <sebastian.flassbeck@nyumc.org>",
     sitename="MRIeddyCurrentOptimization.jl",
